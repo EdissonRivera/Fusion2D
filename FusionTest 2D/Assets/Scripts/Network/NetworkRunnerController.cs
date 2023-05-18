@@ -4,9 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
 {
+    public event Action OnStartedRunnerConnection; //Inicio una conneccion con fusion
+    public event Action OnPlayerJoinedSucessFully; //Jugador se unio correctamente
 
     [SerializeField] private NetworkRunner networkRunnerPrefab;
     private NetworkRunner networkRunnerInstance;
@@ -14,6 +17,8 @@ public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
     //Funcion para Iniciar NetworkRunner y conectarme a x sala
     public async void StartGame(GameMode gameMode, string roomName)
     {
+        OnStartedRunnerConnection?.Invoke();
+
         if (networkRunnerInstance == null)
         {
             networkRunnerInstance = Instantiate(networkRunnerPrefab);
@@ -46,6 +51,14 @@ public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
             Debug.LogError($"Failed to start{result.ShutdownReason}");
         }
     }
+
+    public void ShutDownRunner()
+    {
+        networkRunnerInstance.Shutdown(); //Desconectarnos de la red
+    }
+
+
+
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("ConnectedToServer");
@@ -90,6 +103,7 @@ public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log("PlayerJoin");
+        OnPlayerJoinedSucessFully?.Invoke();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -120,6 +134,9 @@ public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log("Shutdown");
+
+        const string LOBBY_SCENE = "Lobby";
+        SceneManager.LoadScene(LOBBY_SCENE);
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)

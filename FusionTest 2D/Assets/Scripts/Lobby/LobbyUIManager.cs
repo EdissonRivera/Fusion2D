@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LobbyUIManager : MonoBehaviour
 {
+    [SerializeField] private LoadingCanvasController loadingCanvasControllerPrefab;
     [SerializeField] private LobbyPanelBase[] lobbyPanel;
     // Start is called before the first frame update
     void Start()
@@ -13,6 +14,8 @@ public class LobbyUIManager : MonoBehaviour
         {
             lobby.InitPanel(this);
         }
+
+        Instantiate(loadingCanvasControllerPrefab);
     }
 
     //MOSTRAR UN PANEL DETERMINADO
