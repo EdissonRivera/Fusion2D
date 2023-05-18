@@ -1,7 +1,6 @@
 using UnityEngine;
 public class GlobalManagers : MonoBehaviour
 {
-
     public static GlobalManagers Instance { get; private set; }
     
     
