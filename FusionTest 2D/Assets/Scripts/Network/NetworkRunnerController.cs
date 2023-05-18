@@ -7,7 +7,45 @@ using UnityEngine;
 
 public class NetworkRunnerController : MonoBehaviour,INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkRunner _networkRunnerPrefab;
+
+    [SerializeField] private NetworkRunner networkRunnerPrefab;
+    private NetworkRunner networkRunnerInstance;
+
+    //Funcion para Iniciar NetworkRunner y conectarme a x sala
+    public async void StartGame(GameMode gameMode, string roomName)
+    {
+        if (networkRunnerInstance == null)
+        {
+            networkRunnerInstance = Instantiate(networkRunnerPrefab);
+        }
+        //Registra callbacks
+        networkRunnerInstance.AddCallbacks(this);
+
+        
+        //networkRunnerInstance.ProvideInput = true;
+
+        var startGameArgs = new StartGameArgs()
+        {
+            GameMode = gameMode, //Host or client
+            SessionName = roomName, //Code Room
+            PlayerCount = 4,  // MaxPlayers
+            SceneManager = networkRunnerInstance.GetComponent<INetworkSceneManager>() //Default Scene
+        };
+
+        //espera a que termine la funcion
+        var result = await networkRunnerInstance.StartGame(startGameArgs);
+        //Finish 
+        if (result.Ok)
+        {
+            //se unio correctamente
+            const String SCENE_NAME = "MainGame";
+            networkRunnerInstance.SetActiveScene(SCENE_NAME);
+        }
+        else
+        {
+            Debug.LogError($"Failed to start{result.ShutdownReason}");
+        }
+    }
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("ConnectedToServer");
