@@ -5,5 +5,6 @@ using UnityEngine;
 
 public struct PlayerData : INetworkInput
 {
-    public float HorizontalInput;
+    public float HorizontalInput; //Movimiento horizontal
+    public NetworkButtons NetworkButtons; //Salto
 }
